@@ -1,6 +1,11 @@
+## CircleCI Integration
 
+This repository has been verified with CircleCI
 
----
+[![CircleCI](https://circleci.com/gh/mjpraino/Udacity-Project5.svg?style=svg)](https://circleci.com/gh/mjpraino/Udacity-Project5)
+
+# Udacity - Operationalize a Machine Learning Microservice API
+
 
 ## Setup the Environment
 
