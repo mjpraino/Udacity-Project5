@@ -6,9 +6,9 @@ pipeline {
         sh 'make build'
       }
     }
-    stage('Lint') {
+    stage('Lint HTML') {
       steps {
-        sh 'make lint'
+        sh 'tidy -q -e *.html'
       }
     }
     stage('Login to dockerhub') {
