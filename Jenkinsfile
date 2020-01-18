@@ -10,23 +10,31 @@ pipeline {
       steps {
         sh 'tidy -q -e *.html'
       }
-    }
-    stage('Login to dockerhub') {
-      steps {
-        withCredentials([string(credentialsId: 'docker-pwd', variable: 'dockerhubpwd')]) {
-          sh 'docker login -u mjpraino -p ${dockerhubcredentials}'
+    }'''
+        }
+      }
+      stage('Lint') {
+        steps {
+          sh 'make lint'
+        }
+      }
+      stage('Login to dockerhub') {
+        steps {
+          withCredentials(bindings: [string(credentialsId: 'docker-pwd', variable: 'dockerhubpwd')]) {
+            sh 'docker login -u mjpraino -p ${dockerhubcredentials}'
+          }
+
+        }
+      }
+      stage('Upload Image') {
+        steps {
+          sh 'make upload'
+        }
+      }
+      stage('Deploy Kubernetes') {
+        steps {
+          sh 'kubectl apply -f ./kubernetes'
         }
       }
     }
-    stage('Upload Image') {
-      steps {
-        sh 'make upload'
-      }
-    }
-    stage('Deploy Kubernetes') {
-      steps {
-        sh 'kubectl apply -f ./kubernetes'
-      }
-    }
   }
-}
