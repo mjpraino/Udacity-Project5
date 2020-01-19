@@ -1,32 +1,35 @@
 pipeline {
+  environment {
+    registry = "mjpraino/docker-test"
+    registryCredential = 'dockerhub'
+    dockerImage = ''
+  }
   agent any
   stages {
-    stage('Build Docker') {
+    stage('Cloning Git') {
       steps {
-        sh 'make build'
+        git 'https://github.com/mjpraino/Udacity-Project5'
       }
     }
-    stage('Lint') {
-      steps {
-        sh 'make lint'
-      }
-    }
-    stage('Login to dockerhub') {
-      steps {
-        withCredentials(bindings: [string(credentialsId: 'docker-pwd', variable: 'dockerhubpwd')]) {
-          sh 'docker login -u mjpraino -p ${dockerhubcredentials}'
+    stage('Building image') {
+      steps{
+        script {
+          dockerImage = docker.build registry + ":$BUILD_NUMBER"
         }
-
       }
     }
-    stage('Upload Image') {
-      steps {
-        sh 'make upload'
+    stage('Deploy Image') {
+      steps{
+        script {
+          docker.withRegistry( '', registryCredential ) {
+            dockerImage.push()
+          }
+        }
       }
     }
-    stage('Deploy Kubernetes') {
-      steps {
-        sh 'kubectl apply -f ./kubernetes'
+    stage('Remove Unused docker image') {
+      steps{
+        bat "docker rmi $registry:$BUILD_NUMBER"
       }
     }
   }
